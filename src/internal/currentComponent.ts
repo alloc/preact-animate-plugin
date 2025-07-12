@@ -1,24 +1,11 @@
-import { options } from 'preact'
+import { PrivateHook, hook } from './hook'
 import { getComponentForVNode } from './vnode'
 
 export let currentComponent: any = null
 
 let componentStack: any[] = []
 
-const enum Hook {
-  Diff = '__b',
-  Render = '__r',
-}
-
-function hook(name: Hook | keyof typeof options, hook: (arg: any) => void) {
-  const original = (options as any)[name]
-  ;(options as any)[name] = (arg: any) => {
-    original?.(arg)
-    hook(arg)
-  }
-}
-
-hook(Hook.Render, (vnode: any) => {
+hook(PrivateHook.Render, (vnode: any) => {
   componentStack.push(currentComponent)
   currentComponent = getComponentForVNode(vnode)
   // console.log('[render]', currentComponent)

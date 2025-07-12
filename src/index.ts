@@ -1,4 +1,4 @@
-import { options, VNode } from 'preact'
+import { VNode } from 'preact'
 import {
   Animation,
   applyLifecycleAnimation,
@@ -7,6 +7,7 @@ import {
 import { diffEventAnimation } from './eventAnimation'
 import { getContextValue } from './internal/context'
 import { currentComponent } from './internal/currentComponent'
+import { hook } from './internal/hook'
 import { getElementForVNode } from './internal/vnode'
 import { PresenceContext } from './presence'
 import { splitAnimateProp } from './props'
@@ -23,22 +24,16 @@ declare module 'preact' {
 const animationQueue = new WeakMap<VNode, AnimateProp>()
 const animations = new WeakMap<Element, Animation>()
 
-const original = { ...options }
-
-options.vnode = vnode => {
-  original.vnode?.(vnode)
-
+hook('vnode', (vnode: VNode) => {
   if (typeof vnode.type === 'string' && 'animate' in vnode.props) {
     const { animate, ...props } = vnode.props
     vnode.props = props
 
     animationQueue.set(vnode, animate as AnimateProp)
   }
-}
+})
 
-options.diffed = vnode => {
-  original.diffed?.(vnode)
-
+hook('diffed', (vnode: VNode) => {
   const dom = getElementForVNode(vnode)
   if (dom) {
     const props = animationQueue.get(vnode)
@@ -121,17 +116,15 @@ options.diffed = vnode => {
       applyUpdateAnimation(dom, animation, props, update)
     }
   }
-}
+})
 
-options.unmount = vnode => {
-  original.unmount?.(vnode)
-
+hook('unmount', (vnode: VNode) => {
   const dom = getElementForVNode(vnode)
   if (dom) {
     const animation = animations.get(dom)
     animation?.leaveSubscription?.remove()
   }
-}
+})
 
 function diffLeaveAnimation(
   dom: HTMLElement,
