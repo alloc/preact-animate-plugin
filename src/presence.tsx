@@ -63,8 +63,8 @@ export function AnimatePresence(props: {
 
   const children = castArray(props.children)
   children.forEach(child => {
-    if (child && typeof child === 'object') {
-      nextNodes.push(child as VNode)
+    if (isVNode(child)) {
+      nextNodes.push(child)
     }
   })
 
@@ -107,4 +107,13 @@ export function AnimatePresence(props: {
 function useForceUpdate() {
   const [, setState] = useState(0)
   return () => setState(state => state + 1)
+}
+
+function isVNode(value: any): value is VNode {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'type' in value &&
+    'props' in value
+  )
 }
