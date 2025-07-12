@@ -174,24 +174,6 @@ function diffLeaveAnimation(
   }
 }
 
-export {
-  anticipate,
-  backIn,
-  backInOut,
-  backOut,
-  circIn,
-  circInOut,
-  circOut,
-  cubicBezier,
-  easeIn,
-  easeInOut,
-  easeOut,
-  spring,
-  stagger,
-  steps,
-  transform,
-} from 'motion'
-
 export { animate } from 'motion/mini'
 
 export { AnimatePresence } from './presence'
