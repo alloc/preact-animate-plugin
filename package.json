@@ -18,7 +18,7 @@
   "prettier": "@alloc/prettier-config",
   "scripts": {
     "dev": "rimraf dist && tsup --sourcemap --watch",
-    "build": "rimraf dist && tsup",
+    "build": "rimraf dist && tsup --treeshake smallest",
     "format": "prettier --write .",
     "lint": "tsc-lint",
     "test": "vitest",
