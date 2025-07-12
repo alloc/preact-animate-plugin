@@ -92,20 +92,20 @@ The following event-driven animations are supported:
   Animate when this element is pressed on.
 
 ```tsx
-<div
+<div animate={{
   // Start out invisible.
-  style={{ opacity: 0 }}
-  animate={{
-    // Fade in when added to the DOM.
-    enter: {
-      opacity: 1,
-    },
-    // Scale up while hovered over.
-    whileHover: {
-      transform: 'scale(1.1)',
-      duration: 0.2,
-    },
-  }}
+  initial: {
+    opacity: 0,
+  },
+  // Fade in when added to the DOM.
+  enter: {
+    opacity: 1,
+  },
+  // Scale up while hovered over.
+  whileHover: {
+    transform: 'scale(1.1)',
+    duration: 0.2,
+  },
 }}>
 ```
 
@@ -191,7 +191,6 @@ Easing functions are provided by the `motion` package.
   ```
 
   These easing functions can be imported from `motion`:
-
   - `cubicBezier`
   - `easeIn` / `easeOut` / `easeInOut`
   - `backIn` / `backOut` / `backInOut`
