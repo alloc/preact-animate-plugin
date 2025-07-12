@@ -133,6 +133,7 @@ function diffLeaveAnimation(
 ) {
   if (initial && leave?.reverse) {
     Object.assign(leave, initial)
+    delete leave.reverse
   }
   if (leave) {
     const presence = getContextValue(PresenceContext)
