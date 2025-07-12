@@ -1,0 +1,204 @@
+# preact-in-motion
+
+This package uses the [Preact Options API](https://preactjs.com/guide/v10/options/) to introduce an `animate` prop to every native element (e.g. `<div>`, `<span>`, `<button>`, etc.). It uses the `motion/mini` package to animate the elements. To understand which features of Motion are supported, see [this comparison table](https://motion.dev/docs/feature-comparison#comparison-table).
+
+## Installation
+
+Choose your package manager, then install this package and the `motion` package.
+
+- **PNPM**
+
+  ```
+  pnpm add preact-in-motion motion
+  ```
+
+- **Bun**
+
+  ```
+  bun add preact-in-motion motion
+  ```
+
+- **Yarn**
+
+  ```
+  yarn add preact-in-motion motion
+  ```
+
+- **NPM**
+  ```
+  npm install preact-in-motion motion
+  ```
+
+## Usage
+
+Always import the package, so it can install itself into Preact at runtime.
+
+```ts
+import 'preact-in-motion'
+```
+
+Now you can define the `animate` prop on any **host element** (e.g. `<div>`, `<span>`, `<button>`, including SVG elements).
+
+```tsx
+// Animate the opacity when a boolean changes on rerender.
+<div animate={{
+  opacity: visible ? 1 : 0,
+}}>
+```
+
+Animation options (e.g. `duration`, `ease`, etc) may be defined next to the keyframes. [See the Motion docs for details.](https://motion.dev/docs/animate#options)
+
+```tsx
+import { easeInOut } from 'motion'
+
+<div animate={{
+  opacity: visible ? 1 : 0,
+  duration: 1,
+  ease: easeInOut,
+}}>
+```
+
+You may set an `options` function to customize the animation options for each style property.
+
+```tsx
+<div animate={{
+  opacity: visible ? 1 : 0,
+  transform: `scale(${visible ? 1 : 0.5})`,
+  options: prop => ({
+    duration: prop === 'opacity' ? 1 : 0.2,
+  }),
+}}>
+```
+
+When the element's parent component is re-rendered, the keyframes will be diffed. If any keyframes are different, a new animation will be scheduled.
+
+### Lifecycle animations
+
+The following event-driven animations are supported:
+
+- `initial`
+  Style values to be applied before mounting.
+- `update`
+  Animate when this element is re-rendered.
+- `enter`
+  Animate when this element is added to the DOM.
+- `leave`
+  Animate before this element is removed from the DOM. (must use `<AnimatePresence>`)
+- `whileHover`
+  Animate when this element is hovered on.
+- `whileFocus`
+  Animate when this element is focused.
+- `whilePress`
+  Animate when this element is pressed on.
+
+```tsx
+<div
+  // Start out invisible.
+  style={{ opacity: 0 }}
+  animate={{
+    // Fade in when added to the DOM.
+    enter: {
+      opacity: 1,
+    },
+    // Scale up while hovered over.
+    whileHover: {
+      transform: 'scale(1.1)',
+      duration: 0.2,
+    },
+  }}
+}}>
+```
+
+### AnimatePresence
+
+To animate an element before unmounting it, you must wrap the element or its parent component with an `<AnimatePresence>` element.
+
+```tsx
+<AnimatePresence>
+  {visible && (
+    <h1
+      animate={{
+        // Fade out before unmounting.
+        leave: {
+          opacity: 0,
+        },
+      }}>
+      Fade Into Obscurity
+    </h1>
+  )}
+</AnimatePresence>
+```
+
+If toggling between 2+ elements, you must set a `key` prop on each element.
+
+Additionally, you may use the `enterDelay` prop on `AnimatePresence` to force “enter animations” to wait. This delay is only applied when a “leave animation” is in progress, making it useful for smooth transitions between elements.
+
+```tsx
+<AnimatePresence enterDelay={300}>
+  {isHappy ? (
+    <span
+      key="happy"
+      animate={{
+        initial: { transform: 'translateX(50px)', opacity: 0 },
+        enter: { transform: 'translateX(0)', opacity: 1 },
+        leave: { reverse: true },
+      }}>
+      😄 I'm happy!
+    </span>
+  ) : (
+    <span
+      key="sad"
+      animate={{
+        initial: { transform: 'translateX(-50px)', opacity: 0 },
+        enter: { transform: 'translateX(0)', opacity: 1 },
+        leave: { reverse: true },
+      }}>
+      😢 I'm sad...
+    </span>
+  )}
+</AnimatePresence>
+```
+
+You may set `reverse: true` on the `leave` prop to copy keyframes from the `initial` prop.
+
+### Easing
+
+Easing functions are provided by the `motion` package.
+
+- **Spring animations** ([docs](https://motion.dev/docs/spring))
+
+  ```tsx
+  import { spring } from 'motion'
+
+  <div animate={{
+    transform: 'scale(1.1)',
+    type: spring,
+    bounce: 1,
+    duration: 3,
+  }}>
+  ```
+
+- **Easing functions** ([docs](https://motion.dev/docs/easing-functions))
+  The `ease` prop accepts a function, pre-defined string, or a cubic bezier array (e.g. `[0.25, 0.1, 0.25, 1]`).
+
+  ```tsx
+  import { easeInOut } from 'motion'
+
+  <div animate={{
+    transform: 'scale(1.1)',
+    ease: easeInOut,
+  }}>
+  ```
+
+  These easing functions can be imported from `motion`:
+
+  - `cubicBezier`
+  - `easeIn` / `easeOut` / `easeInOut`
+  - `backIn` / `backOut` / `backInOut`
+  - `circIn` / `circOut` / `circInOut`
+  - `anticipate`
+  - `steps`
+
+## License
+
+MIT

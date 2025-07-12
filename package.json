@@ -1,0 +1,49 @@
+{
+  "name": "preact-in-motion",
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "author": "Alec Larson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alloc/preact-in-motion.git"
+  },
+  "prettier": "@alloc/prettier-config",
+  "scripts": {
+    "dev": "rimraf dist && tsup --sourcemap --watch",
+    "build": "rimraf dist && tsup",
+    "format": "prettier --write .",
+    "lint": "tsc-lint",
+    "test": "vitest",
+    "prepublishOnly": "pnpm build"
+  },
+  "devDependencies": {
+    "@alloc/prettier-config": "^1.0.0",
+    "@preact/signals": "^2.2.1",
+    "@types/node": "^24.0.13",
+    "motion": "^12.23.3",
+    "preact": "^10.26.9",
+    "preact-in-motion": "link:",
+    "prettier": "^3.6.2",
+    "radashi": "13.0.0-beta.99854e3",
+    "rimraf": "^6.0.1",
+    "tsc-lint": "^0.1.9",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "motion": ">=12",
+    "preact": ">=10"
+  },
+  "dependencies": {
+    "dequal": "^2.0.3"
+  }
+}
