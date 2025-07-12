@@ -1,0 +1,22 @@
+{
+  "name": "vite-preact-ts-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@preact/signals": "^2.2.1",
+    "motion": "^12.23.3",
+    "preact": "^10.26.9",
+    "preact-in-motion": "link:.."
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.2",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4"
+  }
+}
