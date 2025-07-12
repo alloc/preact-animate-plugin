@@ -46,6 +46,8 @@ Now you can define the `animate` prop on any **host element** (e.g. `<div>`, `<s
 }}>
 ```
 
+When the element's parent component is re-rendered, the keyframes will be diffed. If any keyframes are different, a new animation will be scheduled.
+
 Animation options (e.g. `duration`, `ease`, etc) may be defined next to the keyframes. [See the Motion docs for details.](https://motion.dev/docs/animate#options)
 
 ```tsx
@@ -58,19 +60,33 @@ import { easeInOut } from 'motion'
 }}>
 ```
 
-You may set an `options` function to customize the animation options for each style property.
+### Property-specific options
+
+You may set a `transition` function to customize the animation options for each style property.
 
 ```tsx
 <div animate={{
   opacity: visible ? 1 : 0,
   transform: `scale(${visible ? 1 : 0.5})`,
-  options: prop => ({
+  transition: prop => ({
     duration: prop === 'opacity' ? 1 : 0.2,
   }),
 }}>
 ```
 
-When the element's parent component is re-rendered, the keyframes will be diffed. If any keyframes are different, a new animation will be scheduled.
+Alternatively, the `transition` prop can be set to an object, with property-specific options.
+
+```tsx
+// Identical to the previous example.
+<div animate={{
+  opacity: visible ? 1 : 0,
+  transform: `scale(${visible ? 1 : 0.5})`,
+  transition: {
+    duration: 0.2,
+    opacity: { duration: 1 },
+  },
+}}>
+```
 
 ### Lifecycle animations
 

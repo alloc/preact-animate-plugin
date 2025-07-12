@@ -47,8 +47,19 @@ export function splitAnimateProp(props: any, skipLifecycle?: boolean) {
     }
     if (name === 'ref') {
       ref = value
-    } else if (name === 'options') {
-      optionsFn = value
+    } else if (name === 'transition') {
+      if (typeof value === 'function') {
+        optionsFn = value
+      } else {
+        optionsFn = prop => value[prop]
+
+        for (const name in value) {
+          if (name in SUPPORTED_OPTIONS) {
+            options ??= {}
+            options[name] = value[name]
+          }
+        }
+      }
     } else if (name === 'key') {
       key = value
     } else if (name in SUPPORTED_OPTIONS) {
@@ -76,6 +87,8 @@ export function splitAnimateProp(props: any, skipLifecycle?: boolean) {
 
   if (optionsFn && keyframes) {
     const defaultOptions = { ...options }
+    options = {}
+
     for (const prop in keyframes) {
       options[prop] = {
         ...defaultOptions,

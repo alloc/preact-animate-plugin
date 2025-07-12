@@ -9,7 +9,7 @@ import { SUPPORTED_OPTIONS } from './constants'
 
 export type DOMKeyframesDefinition = Omit<
   import('motion').DOMKeyframesDefinition,
-  keyof TransformProperties
+  keyof TransformProperties | `transition${string}`
 >
 
 export type AnimationRef = Ref<AnimationPlaybackControlsWithThen>
@@ -31,7 +31,9 @@ export interface AnimationOptions extends MotionMiniOptions {
   /**
    * Customize the animation options for each style property.
    */
-  options?: AnimationOptionsFn
+  transition?:
+    | { [K in keyof DOMKeyframesDefinition]?: MotionMiniOptions }
+    | AnimationOptionsFn
 }
 
 export type AnimationProps = DOMKeyframesDefinition & AnimationOptions
