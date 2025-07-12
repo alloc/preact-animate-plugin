@@ -6,6 +6,8 @@
 
 This package uses the [Preact Options API](https://preactjs.com/guide/v10/options/) to introduce an `animate` prop to every native element (e.g. `<div>`, `<span>`, `<button>`, etc.). It uses the `motion/mini` package to animate the elements. To understand which features of Motion are supported, see [this comparison table](https://motion.dev/docs/feature-comparison#comparison-table).
 
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/vitejs-vite-4pdjtwqz?file=src%2Fapp.tsx)
+
 ## Installation
 
 Choose your package manager, then install this package and the `motion` package.
