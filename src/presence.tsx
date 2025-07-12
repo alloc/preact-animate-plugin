@@ -65,6 +65,12 @@ export function AnimatePresence(props: {
   children.forEach(child => {
     if (isVNode(child)) {
       nextNodes.push(child)
+
+      if (typeof child.type === 'string' && 'animate' in child.props) {
+        // @ts-ignore: Native elements won't have access to the context, so
+        // inject it as a prop.
+        child.props.presence = context
+      }
     }
   })
 

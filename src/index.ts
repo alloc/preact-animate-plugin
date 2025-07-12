@@ -21,22 +21,24 @@ declare module 'preact' {
   }
 }
 
-const animationQueue = new WeakMap<VNode, AnimateProp>()
+const vnodeToPresence = new WeakMap<VNode, PresenceContext | undefined>()
+const vnodeToAnimateProp = new WeakMap<VNode, AnimateProp>()
 const animations = new WeakMap<Element, Animation>()
 
 hook('vnode', (vnode: VNode) => {
   if (typeof vnode.type === 'string' && 'animate' in vnode.props) {
-    const { animate, ...props } = vnode.props
+    const { animate, presence, ...props } = vnode.props as any
     vnode.props = props
 
-    animationQueue.set(vnode, animate as AnimateProp)
+    vnodeToPresence.set(vnode, presence)
+    vnodeToAnimateProp.set(vnode, animate)
   }
 })
 
 hook('diffed', (vnode: VNode) => {
   const dom = getElementForVNode(vnode)
   if (dom) {
-    const props = animationQueue.get(vnode)
+    const props = vnodeToAnimateProp.get(vnode)
     if (!props) {
       return
     }
@@ -75,7 +77,8 @@ hook('diffed', (vnode: VNode) => {
           Object.assign(dom.style, lifecycle.initial)
         }
         if (lifecycle.enter) {
-          const presence = getContextValue(PresenceContext)
+          const presence =
+            vnodeToPresence.get(vnode) || getContextValue(PresenceContext)
 
           let props = lifecycle.enter
           if (typeof props === 'function') {
@@ -88,7 +91,13 @@ hook('diffed', (vnode: VNode) => {
           applyLifecycleAnimation(dom, animation, props)
         }
       }
-      diffLeaveAnimation(dom, animation, lifecycle)
+      diffLeaveAnimation(
+        dom,
+        vnode,
+        animation,
+        lifecycle.leave,
+        lifecycle.initial
+      )
       diffEventAnimation(
         dom,
         animation,
@@ -128,18 +137,22 @@ hook('unmount', (vnode: VNode) => {
 
 function diffLeaveAnimation(
   dom: HTMLElement,
+  vnode: VNode,
   animation: Animation,
-  { leave, initial }: AnimateLifecycleProps
+  leave: AnimateLifecycleProps['leave'],
+  initial: AnimateLifecycleProps['initial']
 ) {
-  if (initial && leave?.reverse) {
-    Object.assign(leave, initial)
-    delete leave.reverse
-  }
   if (leave) {
-    const presence = getContextValue(PresenceContext)
+    const presence =
+      vnodeToPresence.get(vnode) || getContextValue(PresenceContext)
     if (!presence) {
       console.warn('Cannot use animate.leave without AnimatePresence', dom)
       return
+    }
+
+    if (leave.reverse) {
+      Object.assign(leave, initial)
+      delete leave.reverse
     }
 
     animation.leaveProps = leave
