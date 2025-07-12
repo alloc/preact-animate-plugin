@@ -1,5 +1,9 @@
 # preact-in-motion
 
+[![NPM version](https://img.shields.io/npm/v/preact-in-motion.svg?style=flat&colorA=080f12&colorB=1fa669)](https://www.npmjs.com/package/preact-in-motion)
+[![License](https://img.shields.io/github/license/alloc/preact-in-motion.svg?style=flat&colorA=080f12&colorB=1fa669)](https://github.com/alloc/preact-in-motion/blob/main/LICENSE)
+[![Bundle size](https://deno.bundlejs.com/badge?q=preact-in-motion@latest)](https://bundlejs.com/?q=preact-in-motion)
+
 This package uses the [Preact Options API](https://preactjs.com/guide/v10/options/) to introduce an `animate` prop to every native element (e.g. `<div>`, `<span>`, `<button>`, etc.). It uses the `motion/mini` package to animate the elements. To understand which features of Motion are supported, see [this comparison table](https://motion.dev/docs/feature-comparison#comparison-table).
 
 ## Installation
