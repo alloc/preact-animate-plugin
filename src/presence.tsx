@@ -70,9 +70,6 @@ export function AnimatePresence(props: {
 
   const forceUpdate = useForceUpdate()
   const leavingNodes = prevNodes.filter(prevNode => {
-    if (prevNode.key == null) {
-      return false
-    }
     if (nextNodes.some(nextNode => nextNode.key === prevNode.key)) {
       return false
     }
