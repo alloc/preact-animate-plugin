@@ -1,4 +1,3 @@
-import { dequal } from 'dequal'
 import { AnimationPlaybackControlsWithThen } from 'motion'
 import { animate } from 'motion/mini'
 import { EventAnimation } from './eventAnimation'
@@ -46,7 +45,7 @@ export function applyUpdateAnimation(
 ) {
   const needsUpdate =
     key === undefined
-      ? !dequal(keyframes, animation.keyframes)
+      ? !shallowPropertiesEqual(keyframes, animation.keyframes)
       : key !== animation.key
 
   if (!needsUpdate) {
@@ -121,4 +120,19 @@ export function updateAnimationRef(
   } else {
     ref.current = controls
   }
+}
+
+function shallowPropertiesEqual(left: any, right: any) {
+  if (!left && !right) {
+    return true
+  }
+  if (!left || !right) {
+    return false
+  }
+  const leftKeys = Object.keys(left)
+  const rightKeys = Object.keys(right)
+  if (leftKeys.length !== rightKeys.length) {
+    return false
+  }
+  return leftKeys.every(key => Object.is(left[key], right[key]))
 }
