@@ -201,6 +201,7 @@ Easing functions are provided by the `motion` package.
   ```
 
 - **Easing functions** ([docs](https://motion.dev/docs/easing-functions))
+
   The `ease` prop accepts a function, pre-defined string, or a cubic bezier array (e.g. `[0.25, 0.1, 0.25, 1]`).
 
   ```tsx
