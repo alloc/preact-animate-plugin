@@ -24,7 +24,10 @@ export interface Animation {
   leaveProps: AnimationProps | null
   /** The callback used to subscribe to the presence context. */
   leaveSubscription: PresenceSubscription | null
-  /** The initial values of the node. */
+  /**
+   * The initial values of the node. This property only exists to improve the
+   * functionality of the `leave.reverse` option.
+   */
   initial: Record<string, any> | undefined
   /**
    * The last keyframes this node was animated with. This property is not used
