@@ -156,7 +156,7 @@ If the children of `AnimatePresence` could possibly be reordered or toggled (i.e
 Additionally, you may use the `enterDelay` prop on `AnimatePresence` to force “enter animations” to wait. This delay is only applied when a “leave animation” is in progress, making it useful for smooth transitions between elements.
 
 ```tsx
-<AnimatePresence enterDelay={300}>
+<AnimatePresence enterDelay={0.3}>
   {isHappy ? (
     <span
       key="happy"
