@@ -1,10 +1,9 @@
-// @ts-nocheck
-import 'preact-in-motion'
+import { useSignal } from '@preact/signals'
 import { easeInOut, spring } from 'motion'
+import type { FunctionalComponent } from 'preact'
+import 'preact-in-motion'
 import { AnimatePresence } from 'preact-in-motion'
 import { useState } from 'preact/hooks'
-import { signal, useSignal } from '@preact/signals'
-import type { FunctionalComponent } from 'preact'
 import './app.css'
 
 // Basic Animation Component
@@ -15,8 +14,7 @@ const BasicAnimation = ({ visible }: { visible: boolean }) => {
         opacity: visible ? 1 : 0,
         duration: 1,
         ease: easeInOut,
-      }}
-    >
+      }}>
       Basic Animation
     </div>
   )
@@ -29,11 +27,10 @@ const PropertySpecificFunction = ({ visible }: { visible: boolean }) => {
       animate={{
         opacity: visible ? 1 : 0,
         transform: `scale(${visible ? 1 : 0.5})`,
-        transition: (prop) => ({
+        transition: prop => ({
           duration: prop === 'opacity' ? 1 : 0.2,
         }),
-      }}
-    >
+      }}>
       Property-specific Animation (Function)
     </div>
   )
@@ -50,8 +47,7 @@ const PropertySpecificObject = ({ visible }: { visible: boolean }) => {
           duration: 0.2,
           opacity: { duration: 1 },
         },
-      }}
-    >
+      }}>
       Property-specific Animation (Object)
     </div>
   )
@@ -71,11 +67,10 @@ const LifecycleAnimations = () => {
             opacity: 1,
           },
           whileHover: {
-            transform: 'scale(1.6)',
+            transform: 'scale(1.3)',
             duration: 0.2,
           },
-        }}
-      >
+        }}>
         Hover me
       </button>
     </>
@@ -92,8 +87,7 @@ const AnimatePresenceExample = ({ visible }: { visible: boolean }) => {
             leave: {
               opacity: 0,
             },
-          }}
-        >
+          }}>
           Fade Out Then Unmount
         </h3>
       )}
@@ -115,8 +109,7 @@ const AnimatePresenceMultiple = () => {
               initial: { transform: 'translateX(50px)', opacity: 0 },
               enter: { transform: 'translateX(0)', opacity: 1 },
               leave: { reverse: true },
-            }}
-          >
+            }}>
             😄 I'm happy!
           </span>
         ) : (
@@ -126,8 +119,7 @@ const AnimatePresenceMultiple = () => {
               initial: { transform: 'translateX(-50px)', opacity: 0 },
               enter: { transform: 'translateX(0)', opacity: 1 },
               leave: { reverse: true },
-            }}
-          >
+            }}>
             😢 I'm sad...
           </span>
         )}
@@ -147,8 +139,7 @@ const SpringAnimation = () => {
         bounce: 1,
         duration: 3,
         repeat: Infinity,
-      }}
-    >
+      }}>
       Spring Animation
     </div>
   )
@@ -164,8 +155,7 @@ const EasingFunction = () => {
         duration: 3,
         repeat: Infinity,
         repeatType: 'reverse',
-      }}
-    >
+      }}>
       Easing Function Animation
     </div>
   )
@@ -198,8 +188,7 @@ export const App = () => {
         flexDirection: 'column',
         gap: '16px',
         padding: '20px',
-      }}
-    >
+      }}>
       {[
         withVisibilityToggle(BasicAnimation),
         withVisibilityToggle(PropertySpecificFunction),
@@ -209,7 +198,7 @@ export const App = () => {
         AnimatePresenceMultiple,
         SpringAnimation,
         EasingFunction,
-      ].map((Component) => (
+      ].map(Component => (
         <Example>
           <Component />
         </Example>
