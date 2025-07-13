@@ -2,7 +2,7 @@ import { AnimationPlaybackControlsWithThen } from 'motion'
 import { ComponentChildren, createContext, Key, VNode } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { castArray } from 'radashi'
-import { getComponentForVNode, getElementForVNode } from './internal/vnode'
+import { getElementForVNode } from './internal/vnode'
 import { vnodeToAnimateProp, vnodeToPresence } from './vnodeCaches'
 
 export interface PresenceSubscription {
@@ -11,16 +11,15 @@ export interface PresenceSubscription {
 }
 
 export type PresenceCallback = (
-  leavingElement: Element | null,
-  leavingComponent: any
-) => AnimationPlaybackControlsWithThen | null
+  leavingElement: Element
+) => AnimationPlaybackControlsWithThen | null | void
 
 export type PresenceContext = {
   isInitial: boolean
   enterDelay: number | undefined
   keys: Key[]
   nodes: VNode[]
-  leavingKeys: Set<string>
+  leaveAnimations: Map<string, AnimationPlaybackControlsWithThen>
   subscriptions: Set<PresenceSubscription>
   subscribe: (callback: PresenceCallback) => PresenceSubscription
 }
@@ -40,7 +39,7 @@ export function AnimatePresence(props: {
       enterDelay: undefined,
       keys: [],
       nodes: [],
-      leavingKeys: new Set(),
+      leaveAnimations: new Map(),
       subscriptions: new Set(),
       subscribe(callback) {
         const subscription = {
@@ -86,29 +85,33 @@ export function AnimatePresence(props: {
     if (nextKeys.includes(prevKey)) {
       return false
     }
-    if (context.leavingKeys.has(prevKey)) {
+
+    let animation: AnimationPlaybackControlsWithThen | null | void =
+      context.leaveAnimations.get(prevKey)
+
+    if (!animation) {
+      const prevElement = getElementForVNode(prevNode)
+      if (!prevElement) {
+        return false
+      }
+      for (const subscription of context.subscriptions.values()) {
+        animation = subscription.callback(prevElement)
+        if (animation) {
+          context.leaveAnimations.set(prevKey, animation)
+          animation.then(() => {
+            context.leaveAnimations.delete(prevKey)
+            subscription.remove()
+            forceUpdate()
+          })
+        }
+      }
+    }
+
+    if (animation) {
       // Preserve this node in the DOM.
       nextKeys.push(prevKey)
       nextNodes.push(prevNode)
       return true
-    }
-    const prevElement = getElementForVNode(prevNode)
-    const prevComponent = getComponentForVNode(prevNode)
-    for (const subscription of context.subscriptions.values()) {
-      const animation = subscription.callback(prevElement, prevComponent)
-      if (animation) {
-        context.leavingKeys.add(prevKey)
-        animation.then(() => {
-          context.leavingKeys.delete(prevKey)
-          subscription.remove()
-          forceUpdate()
-        })
-
-        // Preserve this node in the DOM.
-        nextKeys.push(prevKey)
-        nextNodes.push(prevNode)
-        return true
-      }
     }
   })
 

@@ -6,7 +6,6 @@ import {
 } from './animation'
 import { diffEventAnimation } from './eventAnimation'
 import { getContextValue } from './internal/context'
-import { currentComponent } from './internal/currentComponent'
 import { hook, PrivateHook } from './internal/hook'
 import { getElementForVNode } from './internal/vnode'
 import { PresenceContext } from './presence'
@@ -82,7 +81,7 @@ hook('diffed', (vnode: VNode) => {
           if (typeof props === 'function') {
             props = props(presence?.isInitial)
           }
-          if (presence?.enterDelay && presence.leavingKeys.size > 0) {
+          if (presence?.enterDelay && presence.leaveAnimations.size > 0) {
             props = { ...props, delay: presence.enterDelay }
           }
 
@@ -154,24 +153,11 @@ function diffLeaveAnimation(
     }
 
     animation.leaveProps = leave
-
-    if (!animation.leaveSubscription) {
-      const component = currentComponent
-
-      animation.leaveSubscription = presence.subscribe(
-        (leavingElement, leavingComponent) => {
-          const props = animation.leaveProps!
-
-          if (leavingElement?.contains(dom)) {
-            return applyLifecycleAnimation(dom, animation, props)
-          }
-          if (component === leavingComponent) {
-            return applyLifecycleAnimation(dom, animation, props)
-          }
-          return null
-        }
-      )
-    }
+    animation.leaveSubscription ||= presence.subscribe(leavingElement => {
+      if (leavingElement.contains(dom)) {
+        return applyLifecycleAnimation(dom, animation, animation.leaveProps!)
+      }
+    })
   } else if (animation.leaveSubscription) {
     animation.leaveSubscription.remove()
     animation.leaveSubscription = null
