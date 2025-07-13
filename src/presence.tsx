@@ -1,5 +1,5 @@
 import { AnimationPlaybackControlsWithThen } from 'motion'
-import { ComponentChildren, createContext, VNode } from 'preact'
+import { ComponentChildren, createContext, Key, VNode } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { castArray } from 'radashi'
 import { getComponentForVNode, getElementForVNode } from './internal/vnode'
@@ -18,6 +18,7 @@ export type PresenceCallback = (
 export type PresenceContext = {
   isInitial: boolean
   enterDelay: number | undefined
+  keys: Key[]
   nodes: VNode[]
   leavingKeys: Set<string>
   subscriptions: Set<PresenceSubscription>
@@ -37,6 +38,7 @@ export function AnimatePresence(props: {
     return {
       isInitial: true,
       enterDelay: undefined,
+      keys: [],
       nodes: [],
       leavingKeys: new Set(),
       subscriptions: new Set(),
@@ -59,12 +61,17 @@ export function AnimatePresence(props: {
     context.isInitial = false
   }, [])
 
-  const prevNodes: VNode[] = context.nodes
+  const prevNodes = context.nodes
+  const prevKeys = context.keys
+
   const nextNodes: VNode[] = (context.nodes = [])
+  const nextKeys: Key[] = (context.keys = [])
 
   const children = castArray(props.children)
-  children.forEach(child => {
+  children.forEach((child, index) => {
     if (isVNode(child)) {
+      // If a key is not defined, assume the order never changes.
+      nextKeys.push(child.key ?? '__' + index)
       nextNodes.push(child)
 
       if (typeof child.type === 'string' && vnodeToAnimateProp.has(child)) {
@@ -74,12 +81,14 @@ export function AnimatePresence(props: {
   })
 
   const forceUpdate = useForceUpdate()
-  const leavingNodes = prevNodes.filter(prevNode => {
-    if (nextNodes.some(nextNode => nextNode.key === prevNode.key)) {
+  const leavingNodes = prevNodes.filter((prevNode, index) => {
+    const prevKey = prevKeys[index]
+    if (nextKeys.includes(prevKey)) {
       return false
     }
-    if (context.leavingKeys.has(prevNode.key)) {
+    if (context.leavingKeys.has(prevKey)) {
       // Preserve this node in the DOM.
+      nextKeys.push(prevKey)
       nextNodes.push(prevNode)
       return true
     }
@@ -88,14 +97,15 @@ export function AnimatePresence(props: {
     for (const subscription of context.subscriptions.values()) {
       const animation = subscription.callback(prevElement, prevComponent)
       if (animation) {
-        context.leavingKeys.add(prevNode.key)
+        context.leavingKeys.add(prevKey)
         animation.then(() => {
-          context.leavingKeys.delete(prevNode.key)
+          context.leavingKeys.delete(prevKey)
           subscription.remove()
           forceUpdate()
         })
 
         // Preserve this node in the DOM.
+        nextKeys.push(prevKey)
         nextNodes.push(prevNode)
         return true
       }
