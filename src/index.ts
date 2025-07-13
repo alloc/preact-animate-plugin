@@ -49,6 +49,7 @@ hook('diffed', (vnode: VNode) => {
           props: null,
           leaveProps: null,
           leaveSubscription: null,
+          initial: undefined,
           keyframes: undefined,
           options: undefined,
           controls: null,
@@ -146,7 +147,7 @@ function diffLeaveAnimation(
     }
 
     if (leave.reverse) {
-      Object.assign(leave, initial)
+      Object.assign(leave, animation.initial || initial)
       delete leave.reverse
     }
 

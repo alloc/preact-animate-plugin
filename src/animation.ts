@@ -24,6 +24,8 @@ export interface Animation {
   leaveProps: AnimationProps | null
   /** The callback used to subscribe to the presence context. */
   leaveSubscription: PresenceSubscription | null
+  /** The initial values of the node. */
+  initial: Record<string, any> | undefined
   /**
    * The last keyframes this node was animated with. This property is not used
    * for lifecycle animations (except `update`).
@@ -43,11 +45,13 @@ export interface Animation {
 
 function setInitialValues(
   dom: HTMLElement,
+  animation: Animation,
   keyframes: DOMKeyframesDefinition,
   initial: AnimateLifecycleProps['initial']
 ) {
+  animation.initial = initial = { ...initial }
   for (const prop in keyframes) {
-    if (initial?.[prop] !== undefined) {
+    if (initial[prop] !== undefined) {
       continue
     }
     const keyframe = keyframes[prop as never] as ValueKeyframesDefinition
@@ -55,7 +59,7 @@ function setInitialValues(
     // If the value is null, it means the keyframe will be inferred from the
     // computed style, so we don't know its value here.
     if (value !== null) {
-      dom.style[prop as never] = value as any
+      dom.style[prop as never] = initial[prop] = value as any
     }
   }
 }
@@ -88,7 +92,7 @@ export function applyUpdateAnimation(
   }
   if (keyframes) {
     if (!dom.isConnected) {
-      setInitialValues(dom, keyframes, initial)
+      setInitialValues(dom, animation, keyframes, initial)
     }
     setAnimationControls(animation, animate(dom, keyframes, options), ref)
   } else {
@@ -114,7 +118,7 @@ export function applyLifecycleAnimation(
   }
   if (keyframes) {
     if (!dom.isConnected) {
-      setInitialValues(dom, keyframes, initial)
+      setInitialValues(dom, animation, keyframes, initial)
     }
     setAnimationControls(animation, animate(dom, keyframes, options), ref)
     return animation.controls
