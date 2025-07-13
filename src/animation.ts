@@ -152,14 +152,20 @@ export function setAnimationControls(
   ref?: AnimationRef | undefined
 ) {
   animation.controls = controls
-  updateAnimationRef(ref, controls)
+  if (ref) {
+    setAnimationRef(ref, controls)
+    controls?.then(() => {
+      if (controls === animation.controls) {
+        setAnimationRef(ref, null)
+      }
+    })
+  }
 }
 
-export function updateAnimationRef(
-  ref: AnimationRef | undefined,
+function setAnimationRef(
+  ref: Exclude<AnimationRef, null>,
   controls: AnimationPlaybackControlsWithThen | null
 ) {
-  if (!ref) return
   if (typeof ref === 'function') {
     ref(controls)
   } else {
