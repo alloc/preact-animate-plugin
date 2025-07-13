@@ -11,11 +11,11 @@ export function hook(
   name: PrivateHook | keyof typeof options,
   hook: (arg: any) => void
 ) {
-  const before = unsafeOptions[name]
-  unsafeOptions[name] = before
+  const post = unsafeOptions[name]
+  unsafeOptions[name] = post
     ? (arg: any) => {
-        before(arg)
         hook(arg)
+        post(arg)
       }
     : hook
 }

@@ -3,6 +3,7 @@ import { ComponentChildren, createContext, VNode } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { castArray } from 'radashi'
 import { getComponentForVNode, getElementForVNode } from './internal/vnode'
+import { vnodeToAnimateProp, vnodeToPresence } from './vnodeCaches'
 
 export interface PresenceSubscription {
   callback: PresenceCallback
@@ -66,10 +67,8 @@ export function AnimatePresence(props: {
     if (isVNode(child)) {
       nextNodes.push(child)
 
-      if (typeof child.type === 'string' && 'animate' in child.props) {
-        // @ts-ignore: Native elements won't have access to the context, so
-        // inject it as a prop.
-        child.props.presence = context
+      if (typeof child.type === 'string' && vnodeToAnimateProp.has(child)) {
+        vnodeToPresence.set(child, context)
       }
     }
   })

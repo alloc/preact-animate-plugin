@@ -7,11 +7,12 @@ import {
 import { diffEventAnimation } from './eventAnimation'
 import { getContextValue } from './internal/context'
 import { currentComponent } from './internal/currentComponent'
-import { hook } from './internal/hook'
+import { hook, PrivateHook } from './internal/hook'
 import { getElementForVNode } from './internal/vnode'
 import { PresenceContext } from './presence'
 import { splitAnimateProp } from './props'
 import { AnimateLifecycleProps, AnimateProp } from './types'
+import { vnodeToAnimateProp, vnodeToPresence } from './vnodeCaches'
 
 declare module 'preact' {
   namespace JSX {
@@ -21,16 +22,13 @@ declare module 'preact' {
   }
 }
 
-const vnodeToPresence = new WeakMap<VNode, PresenceContext | undefined>()
-const vnodeToAnimateProp = new WeakMap<VNode, AnimateProp>()
 const animations = new WeakMap<Element, Animation>()
 
-hook('vnode', (vnode: VNode) => {
+hook(PrivateHook.Diff, (vnode: VNode) => {
   if (typeof vnode.type === 'string' && 'animate' in vnode.props) {
-    const { animate, presence, ...props } = vnode.props as any
+    const { animate, ...props } = vnode.props as any
     vnode.props = props
 
-    vnodeToPresence.set(vnode, presence)
     vnodeToAnimateProp.set(vnode, animate)
   }
 })
