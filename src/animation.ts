@@ -64,6 +64,17 @@ function setInitialValues(
   }
 }
 
+function assignImmediateValues(
+  dom: HTMLElement,
+  assigned: Record<string, any>
+) {
+  if (dom.isConnected) {
+    requestAnimationFrame(() => Object.assign(dom.style, assigned))
+  } else {
+    Object.assign(dom.style, assigned)
+  }
+}
+
 export function applyUpdateAnimation(
   dom: HTMLElement,
   animation: Animation,
@@ -86,9 +97,7 @@ export function applyUpdateAnimation(
   animation.options = options
 
   if (assigned) {
-    requestAnimationFrame(() => {
-      Object.assign(dom.style, assigned)
-    })
+    assignImmediateValues(dom, assigned)
   }
   if (keyframes) {
     if (!dom.isConnected) {
@@ -112,9 +121,7 @@ export function applyLifecycleAnimation(
   animation.options = options
 
   if (assigned) {
-    requestAnimationFrame(() => {
-      Object.assign(dom.style, assigned)
-    })
+    assignImmediateValues(dom, assigned)
   }
   if (keyframes) {
     if (!dom.isConnected) {
