@@ -32,8 +32,10 @@ export interface AnimationOptions extends MotionMiniOptions {
    * Customize the animation options for each style property.
    */
   transition?:
-    | { [K in keyof DOMKeyframesDefinition]?: MotionMiniOptions }
     | AnimationOptionsFn
+    | (MotionMiniOptions & {
+        [K in keyof DOMKeyframesDefinition]?: MotionMiniOptions
+      })
 }
 
 export type AnimationProps = DOMKeyframesDefinition & AnimationOptions
