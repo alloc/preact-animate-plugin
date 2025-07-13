@@ -151,7 +151,7 @@ To animate an element before unmounting it, you must wrap the element or its par
 </AnimatePresence>
 ```
 
-If toggling between 2+ elements, you must set a `key` prop on each element.
+If the children of `AnimatePresence` could possibly be reordered or toggled (i.e. `isHappy` in the example below), you must set a `key` prop on each element. Note that conditionally mounting a child with `{visible && (...)}` does _not_ require a `key` prop to be set (in this case, the child's index is used as the default key).
 
 Additionally, you may use the `enterDelay` prop on `AnimatePresence` to force “enter animations” to wait. This delay is only applied when a “leave animation” is in progress, making it useful for smooth transitions between elements.
 
