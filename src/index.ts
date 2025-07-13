@@ -60,33 +60,31 @@ hook('diffed', (vnode: VNode) => {
     const { lifecycle, ...update } = splitAnimateProp(props)
 
     if (lifecycle) {
-      if (dom.isConnected) {
-        if (lifecycle.update) {
-          applyUpdateAnimation(
-            dom,
-            animation,
-            props,
-            splitAnimateProp(lifecycle.update, true)
-          )
-        }
-      } else {
-        if (lifecycle.initial) {
-          Object.assign(dom.style, lifecycle.initial)
-        }
-        if (lifecycle.enter) {
-          const presence =
-            vnodeToPresence.get(vnode) || getContextValue(PresenceContext)
+      if (lifecycle.initial && !dom.isConnected) {
+        Object.assign(dom.style, lifecycle.initial)
+      }
+      if (lifecycle.update) {
+        applyUpdateAnimation(
+          dom,
+          animation,
+          props,
+          splitAnimateProp(lifecycle.update, true),
+          lifecycle.initial
+        )
+      }
+      if (lifecycle.enter && !dom.isConnected) {
+        const presence =
+          vnodeToPresence.get(vnode) || getContextValue(PresenceContext)
 
-          let props = lifecycle.enter
-          if (typeof props === 'function') {
-            props = props(presence?.isInitial)
-          }
-          if (presence?.enterDelay && presence.leaveAnimations.size > 0) {
-            props = { ...props, delay: presence.enterDelay }
-          }
-
-          applyLifecycleAnimation(dom, animation, props)
+        let props = lifecycle.enter
+        if (typeof props === 'function') {
+          props = props(presence?.isInitial)
         }
+        if (presence?.enterDelay && presence.leaveAnimations.size > 0) {
+          props = { ...props, delay: presence.enterDelay }
+        }
+
+        applyLifecycleAnimation(dom, animation, props, lifecycle.initial)
       }
       diffLeaveAnimation(
         dom,

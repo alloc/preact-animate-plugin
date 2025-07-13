@@ -1,9 +1,13 @@
-import { AnimationPlaybackControlsWithThen } from 'motion'
+import {
+  AnimationPlaybackControlsWithThen,
+  ValueKeyframesDefinition,
+} from 'motion'
 import { animate } from 'motion/mini'
 import { EventAnimation } from './eventAnimation'
 import { PresenceSubscription } from './presence'
 import { splitAnimateProp, UpdateAnimationProps } from './props'
 import {
+  AnimateLifecycleProps,
   AnimationOptions,
   AnimationProps,
   AnimationRef,
@@ -37,11 +41,31 @@ export interface Animation {
   } | null
 }
 
+function setInitialValues(
+  dom: HTMLElement,
+  keyframes: DOMKeyframesDefinition,
+  initial: AnimateLifecycleProps['initial']
+) {
+  for (const prop in keyframes) {
+    if (initial?.[prop] !== undefined) {
+      continue
+    }
+    const keyframe = keyframes[prop as never] as ValueKeyframesDefinition
+    const value = Array.isArray(keyframe) ? keyframe[0] : keyframe
+    // If the value is null, it means the keyframe will be inferred from the
+    // computed style, so we don't know its value here.
+    if (value !== null) {
+      dom.style[prop as never] = value as any
+    }
+  }
+}
+
 export function applyUpdateAnimation(
   dom: HTMLElement,
   animation: Animation,
   props: AnimationProps,
-  { assigned, keyframes, options, key, ref }: UpdateAnimationProps
+  { assigned, keyframes, options, key, ref }: UpdateAnimationProps,
+  initial?: AnimateLifecycleProps['initial']
 ) {
   const needsUpdate =
     key === undefined
@@ -63,6 +87,9 @@ export function applyUpdateAnimation(
     })
   }
   if (keyframes) {
+    if (!dom.isConnected) {
+      setInitialValues(dom, keyframes, initial)
+    }
     setAnimationControls(animation, animate(dom, keyframes, options), ref)
   } else {
     stopAnimation(animation, ref)
@@ -72,7 +99,8 @@ export function applyUpdateAnimation(
 export function applyLifecycleAnimation(
   dom: HTMLElement,
   animation: Animation,
-  props: AnimationProps
+  props: AnimationProps,
+  initial?: AnimateLifecycleProps['initial']
 ) {
   const { assigned, keyframes, options, ref } = splitAnimateProp(props, true)
 
@@ -85,6 +113,9 @@ export function applyLifecycleAnimation(
     })
   }
   if (keyframes) {
+    if (!dom.isConnected) {
+      setInitialValues(dom, keyframes, initial)
+    }
     setAnimationControls(animation, animate(dom, keyframes, options), ref)
     return animation.controls
   }
