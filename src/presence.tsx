@@ -3,7 +3,7 @@ import { ComponentChildren, createContext, Key, VNode } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { castArray } from 'radashi'
 import { getElementForVNode } from './internal/vnode'
-import { vnodeToAnimateProp, vnodeToPresence } from './vnodeCaches'
+import { vnodeToPresence } from './vnodeCaches'
 
 export interface PresenceSubscription {
   callback: PresenceCallback
@@ -73,7 +73,7 @@ export function AnimatePresence(props: {
       nextKeys.push(child.key ?? '__' + index)
       nextNodes.push(child)
 
-      if (typeof child.type === 'string' && vnodeToAnimateProp.has(child)) {
+      if (typeof child.type === 'string' && 'animate' in child.props) {
         vnodeToPresence.set(child, context)
       }
     }
