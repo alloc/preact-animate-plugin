@@ -1,0 +1,37 @@
+@import './base.css';
+
+.examples {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: start;
+  gap: 16px;
+}
+
+.example {
+  justify-content: center;
+  min-height: 100px;
+  border-radius: 12px;
+  background-color: #2a3a45;
+  padding: 8px 40px;
+}
+
+@media (prefers-color-scheme: light) {
+  .example {
+    background-color: #e6f0f5;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
