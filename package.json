@@ -9,15 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@preact/signals": "^2.2.1",
-    "motion": "^12.23.3",
-    "preact": "^10.26.9",
-    "preact-in-motion": "^0.2.3",
-    "radashi": "^12.6.0"
+    "@preact/signals": "^2",
+    "motion": "^12",
+    "preact": "^10",
+    "preact-in-motion": "*",
+    "radashi": "^12"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.10.2",
-    "typescript": "~5.8.3",
+    "@preact/preset-vite": "^2",
+    "typescript": "^5.8.3",
     "vite": "^7.0.4",
     "vite-tsconfig-paths": "^5.1.4"
   }
