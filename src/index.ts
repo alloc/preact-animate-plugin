@@ -8,9 +8,10 @@ import { diffEventAnimation } from './eventAnimation'
 import { getContextValue } from './internal/context'
 import { hook, PrivateHook } from './internal/hook'
 import { getElementForVNode } from './internal/vnode'
+import { diffLeaveAnimation } from './leaveAnimation'
 import { PresenceContext } from './presence'
 import { splitAnimateProp } from './props'
-import { AnimateLifecycleProps, AnimateProp } from './types'
+import { AnimateProp } from './types'
 import { vnodeToAnimateProp, vnodeToPresence } from './vnodeCaches'
 
 declare module 'preact' {
@@ -130,39 +131,6 @@ hook('unmount', (vnode: VNode) => {
     animation?.leaveSubscription?.remove()
   }
 })
-
-function diffLeaveAnimation(
-  dom: HTMLElement,
-  vnode: VNode,
-  animation: Animation,
-  leave: AnimateLifecycleProps['leave'],
-  initial: AnimateLifecycleProps['initial']
-) {
-  if (leave) {
-    const presence =
-      vnodeToPresence.get(vnode) || getContextValue(PresenceContext)
-    if (!presence) {
-      console.warn('Cannot use animate.leave without AnimatePresence', dom)
-      return
-    }
-
-    if (leave.reverse) {
-      Object.assign(leave, animation.initial || initial)
-      delete leave.reverse
-    }
-
-    animation.leaveProps = leave
-    animation.leaveSubscription ||= presence.subscribe(leavingElement => {
-      if (leavingElement.contains(dom)) {
-        return applyLifecycleAnimation(dom, animation, animation.leaveProps!)
-      }
-    })
-  } else if (animation.leaveSubscription) {
-    animation.leaveSubscription.remove()
-    animation.leaveSubscription = null
-    animation.leaveProps = null
-  }
-}
 
 export { animate } from 'motion/mini'
 
