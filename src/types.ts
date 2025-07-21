@@ -6,6 +6,7 @@ import type {
 import { Ref } from 'preact'
 import { CSSProperties } from 'preact/compat'
 import { SUPPORTED_OPTIONS } from './constants'
+import { falsy } from './internal/types'
 
 export type DOMKeyframesDefinition = Omit<
   import('motion').DOMKeyframesDefinition,
@@ -58,16 +59,24 @@ export type EventAnimationProps = AnimationProps & {
   reverse?: AnimationProps
 }
 
+export type LeaveAnimationProps = AnimationProps & {
+  reverse?: true
+}
+
+export type EnterAnimationCallback = (
+  isInitial: boolean | undefined
+) => AnimationProps
+
 // These animations update on lifecycle events.
 export type AnimateLifecycleProps = {
   /**
    * The initial style values to be applied before mounting.
    */
-  initial?: CSSProperties
+  initial?: CSSProperties | falsy
   /**
    * Animate when this element is re-rendered.
    */
-  update?: AnimateRenderProps
+  update?: AnimateRenderProps | falsy
   /**
    * Animate when this element is added to the DOM.
    *
@@ -75,23 +84,23 @@ export type AnimateLifecycleProps = {
    * mounting at the same time as its `AnimatePresence` parent. This allows you
    * to define a different animation for the first mount.
    */
-  enter?: AnimationProps | ((isInitial: boolean | undefined) => AnimationProps)
+  enter?: AnimationProps | EnterAnimationCallback | falsy
   /**
    * Animate before this element is removed from the DOM.
    */
-  leave?: AnimationProps & { reverse?: true }
+  leave?: LeaveAnimationProps | falsy
   /**
    * Animate when this element is hovered on.
    */
-  whileHover?: EventAnimationProps
+  whileHover?: EventAnimationProps | falsy
   /**
    * Animate when this element is focused.
    */
-  whileFocus?: EventAnimationProps
+  whileFocus?: EventAnimationProps | falsy
   /**
    * Animate when this element is pressed on.
    */
-  whilePress?: EventAnimationProps
+  whilePress?: EventAnimationProps | falsy
 }
 
 export type AnimateProp = AnimateRenderProps | AnimateLifecycleProps

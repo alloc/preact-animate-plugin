@@ -6,6 +6,7 @@ import {
   stopAnimation,
 } from './animation'
 import { getReverseKeyframes } from './internal/motion'
+import { falsy } from './internal/types'
 import { splitAnimateProp } from './props'
 import { DOMKeyframesDefinition, EventAnimationProps } from './types'
 
@@ -19,7 +20,7 @@ export type EventAnimation = {
 export function diffEventAnimation(
   dom: HTMLElement,
   animation: Animation,
-  props: EventAnimationProps | undefined,
+  props: EventAnimationProps | falsy,
   startEvent: string,
   stopEvent: string
 ) {
